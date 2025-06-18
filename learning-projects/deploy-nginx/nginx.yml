@@ -116,7 +116,13 @@ spec:
     path: /nfs/data
     server: 192.168.21.49
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: ""
+  storageClassName: ""  # Explicitly disable dynamic provisioning
+  nodeAffinity:         # Ensure PV is usable by all nodes
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: Exists
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -132,6 +138,12 @@ spec:
     server: 192.168.21.49
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ""
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: Exists
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
