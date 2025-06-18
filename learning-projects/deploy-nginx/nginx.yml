@@ -8,6 +8,8 @@ kind: Deployment
 metadata:
   name: nginx-deployment
   namespace: nginx
+  labels:
+    app: nginx
 spec:
   replicas: 2
   selector:
@@ -18,26 +20,51 @@ spec:
       labels:
         app: nginx
     spec:
+      # Optional: Force pods to specific nodes (for testing)
+      # affinity:
+      #   nodeAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       nodeSelectorTerms:
+      #       - matchExpressions:
+      #         - key: kubernetes.io/hostname
+      #           operator: In
+      #           values: [node-1, node-2]
       containers:
       - name: nginx
-        image: nginx:latest
+        image: nginx:1.25-alpine
         ports:
         - containerPort: 80
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
         volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
         - name: nginx-data
           mountPath: /usr/share/nginx/html
         - name: nginx-logs
           mountPath: /var/log/nginx
       volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-config
       - name: nginx-data
         persistentVolumeClaim:
           claimName: nginx-data-pvc
       - name: nginx-logs
         persistentVolumeClaim:
           claimName: nginx-logs-pvc
-      - name: nginx-config  # <-- Add this
-        configMap:
-          name: nginx-config
 ---
 apiVersion: v1
 kind: ConfigMap
