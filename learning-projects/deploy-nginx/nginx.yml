@@ -1,0 +1,144 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nginx
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: nginx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: nginx-data
+          mountPath: /usr/share/nginx/html
+        - name: nginx-logs
+          mountPath: /var/log/nginx
+      volumes:
+      - name: nginx-data
+        persistentVolumeClaim:
+          claimName: nginx-data-pvc
+      - name: nginx-logs
+        persistentVolumeClaim:
+          claimName: nginx-logs-pvc
+      - name: nginx-config  # <-- Add this
+        configMap:
+          name: nginx-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: nginx
+data:
+  nginx.conf: |
+    user  nginx;
+    worker_processes  auto;
+
+    # Load environment variables
+    env NODE_NAME;
+    env POD_NAME;
+    env POD_IP;
+
+    events {
+      worker_connections  1024;
+    }
+
+    http {
+      log_format custom_log '[$time_local] node="$NODE_NAME" pod="$POD_NAME" pod_ip="$POD_IP" '
+                           'client="$remote_addr" request="$request" status=$status';
+
+      access_log  /var/log/nginx/access.log  custom_log;
+      error_log   /var/log/nginx/error.log warn;
+
+      server {
+          listen 80;
+          location / {
+              return 200 "Served by Pod: $POD_NAME on Node: $NODE_NAME\n";
+          }
+      }
+    }
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nginx-data-pv
+  namespace: nginx
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /nfs/data
+    server: 192.168.21.49
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nginx-logs-pv
+  namespace: nginx
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /nfs/log
+    server: 192.168.21.49
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-data-pvc
+  namespace: nginx
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: nginx-data-pv
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-logs-pvc
+  namespace: nginx
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: nginx-logs-pv
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  namespace: nginx
+spec:
+  type: LoadBalancer  # Changed from NodePort
+  externalTrafficPolicy: Local  # Preserves client IP
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: nginx
