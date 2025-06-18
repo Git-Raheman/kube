@@ -1,6 +1,3 @@
-Here's a cool and optimized GitHub Markdown version of your MetalLB setup guide, designed for better learning and readability:
-
-```markdown
 # 🚀 MetalLB Load Balancer Setup for Kubernetes
 
 MetalLB provides a network load-balancer implementation for Kubernetes clusters that don't run on cloud providers. It assigns external IPs to `LoadBalancer` services.
