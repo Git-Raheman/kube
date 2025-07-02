@@ -89,10 +89,3 @@ sudo kubectl completion bash > /etc/bash_completion.d/kubectl
 That’s it. All users on your Ubuntu server who use bash with bash-completion installed will get kubectl autocompletion automatically.
 
 ---
-
-If you tell me:
-
-✅ Your Ubuntu version (e.g., 20.04, 22.04)
-✅ Your users’ shells (bash? zsh? other?)
-
-I can give you even more tailored instructions.
