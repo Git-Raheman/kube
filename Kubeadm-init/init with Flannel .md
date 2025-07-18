@@ -1,8 +1,6 @@
 ````markdown
 # Kubernetes Cluster Setup with kubeadm and Flannel
 
----
-
 ## 1️⃣ Initialize the Control Plane
 
 Flannel requires a specific Pod network CIDR. Run:
