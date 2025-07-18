@@ -14,7 +14,6 @@ This repo exists purely for **learning and experimentation**. It includes:
 - Kubernetes experiments
 - Docker and containerization
 - Linux system administration
-- Automation and DevOps basics
 - Notes, tests, and more
 
 ---
