@@ -1,0 +1,83 @@
+# Kubernetes API Resources (Simplified View V2)
+- ✅ = Namespaced resource  
+- ❌ = Cluster-wide resource
+
+| NAME                                      | APIVERSION                            | NAMESPACED  | KIND                                    |
+|-------------------------------------------|---------------------------------------|-------------|-----------------------------------------|
+| apiservices                               | apiregistration.k8s.io/v1             | ❌         | APIService                              |
+| bgpconfigurations                         | crd.projectcalico.org/v1              | ❌         | BGPConfiguration                        |
+| bgpfilters                                | crd.projectcalico.org/v1              | ❌         | BGPFilter                               |
+| bgppeers                                  | crd.projectcalico.org/v1              | ❌         | BGPPeer                                 |
+| blockaffinities                           | crd.projectcalico.org/v1              | ❌         | BlockAffinity                           |
+| caliconodestatuses                        | crd.projectcalico.org/v1              | ❌         | CalicoNodeStatus                        |
+| certificatesigningrequests                | certificates.k8s.io/v1                | ❌         | CertificateSigningRequest               |
+| clusterinformations                       | crd.projectcalico.org/v1              | ❌         | ClusterInformation                      |
+| clusterrolebindings                       | rbac.authorization.k8s.io/v1          | ❌         | ClusterRoleBinding                      |
+| clusterroles                              | rbac.authorization.k8s.io/v1          | ❌         | ClusterRole                             |
+| componentstatuses                         | v1                                    | ❌         | ComponentStatus                         |
+| configmaps                                | v1                                    | ✅         | ConfigMap                               |
+| controllerrevisions                       | apps/v1                               | ✅         | ControllerRevision                      |
+| cronjobs                                  | batch/v1                              | ✅         | CronJob                                 |
+| csidrivers                                | storage.k8s.io/v1                     | ❌         | CSIDriver                               |
+| csinodes                                  | storage.k8s.io/v1                     | ❌         | CSINode                                 |
+| csistoragecapacities                      | storage.k8s.io/v1                     | ✅         | CSIStorageCapacity                      |
+| customresourcedefinitions                 | apiextensions.k8s.io/v1               | ❌         | CustomResourceDefinition                |
+| daemonsets                                | apps/v1                               | ✅         | DaemonSet                               |
+| deployments                               | apps/v1                               | ✅         | Deployment                              |
+| endpoints                                 | v1                                    | ✅         | Endpoints                               |
+| endpointslices                            | discovery.k8s.io/v1                   | ✅         | EndpointSlice                           |
+| events                                    | events.k8s.io/v1                      | ✅         | Event                                   |
+| events                                    | v1                                    | ✅         | Event                                   |
+| felixconfigurations                       | crd.projectcalico.org/v1              | ❌         | FelixConfiguration                      |
+| flowschemas                               | flowcontrol.apiserver.k8s.io/v1       | ❌         | FlowSchema                              |
+| globalnetworkpolicies                     | crd.projectcalico.org/v1              | ❌         | GlobalNetworkPolicy                     |
+| globalnetworksets                         | crd.projectcalico.org/v1              | ❌         | GlobalNetworkSet                        |
+| horizontalpodautoscalers                  | autoscaling/v2                        | ✅         | HorizontalPodAutoscaler                 |
+| hostendpoints                             | crd.projectcalico.org/v1              | ❌         | HostEndpoint                            |
+| ingressclasses                            | networking.k8s.io/v1                  | ❌         | IngressClass                            |
+| ingresses                                 | networking.k8s.io/v1                  | ✅         | Ingress                                 |
+| ipamblocks                                | crd.projectcalico.org/v1              | ❌         | IPAMBlock                               |
+| ipamconfigs                               | crd.projectcalico.org/v1              | ❌         | IPAMConfig                              |
+| ipamhandles                               | crd.projectcalico.org/v1              | ❌         | IPAMHandle                              |
+| ippools                                   | crd.projectcalico.org/v1              | ❌         | IPPool                                  |
+| ipreservations                            | crd.projectcalico.org/v1              | ❌         | IPReservation                           |
+| jobs                                      | batch/v1                              | ✅         | Job                                     |
+| kubecontrollersconfigurations             | crd.projectcalico.org/v1              | ❌         | KubeControllersConfiguration            |
+| leases                                    | coordination.k8s.io/v1                | ✅         | Lease                                   |
+| limitranges                               | v1                                    | ✅         | LimitRange                              |
+| localsubjectaccessreviews                 | authorization.k8s.io/v1               | ✅         | LocalSubjectAccessReview                |
+| mutatingwebhookconfigurations             | admissionregistration.k8s.io/v1       | ❌         | MutatingWebhookConfiguration            |
+| namespaces                                | v1                                    | ❌         | Namespace                               |
+| networkpolicies                           | crd.projectcalico.org/v1              | ✅         | NetworkPolicy                           |
+| networkpolicies                           | networking.k8s.io/v1                  | ✅         | NetworkPolicy                           |
+| networksets                               | crd.projectcalico.org/v1              | ✅         | NetworkSet                              |
+| nodes                                     | v1                                    | ❌         | Node                                    |
+| persistentvolumeclaims                    | v1                                    | ✅         | PersistentVolumeClaim                   |
+| persistentvolumes                         | v1                                    | ❌         | PersistentVolume                        |
+| poddisruptionbudgets                      | policy/v1                             | ✅         | PodDisruptionBudget                     |
+| pods                                      | v1                                    | ✅         | Pod                                     |
+| podtemplates                              | v1                                    | ✅         | PodTemplate                             |
+| priorityclasses                           | scheduling.k8s.io/v1                  | ❌         | PriorityClass                           |
+| prioritylevelconfigurations               | flowcontrol.apiserver.k8s.io/v1       | ❌         | PriorityLevelConfiguration              |
+| replicasets                               | apps/v1                               | ✅         | ReplicaSet                              |
+| replicationcontrollers                    | v1                                    | ✅         | ReplicationController                   |
+| resourcequotas                            | v1                                    | ✅         | ResourceQuota                           |
+| rolebindings                              | rbac.authorization.k8s.io/v1          | ✅         | RoleBinding                             |
+| roles                                     | rbac.authorization.k8s.io/v1          | ✅         | Role                                    |
+| runtimeclasses                            | node.k8s.io/v1                        | ❌         | RuntimeClass                            |
+| secrets                                   | v1                                    | ✅         | Secret                                  |
+| selfsubjectaccessreviews                  | authorization.k8s.io/v1               | ❌         | SelfSubjectAccessReview                 |
+| selfsubjectreviews                        | authentication.k8s.io/v1              | ❌         | SelfSubjectReview                       |
+| selfsubjectrulesreviews                   | authorization.k8s.io/v1               | ❌         | SelfSubjectRulesReview                  |
+| serviceaccounts                           | v1                                    | ✅         | ServiceAccount                          |
+| services                                  | v1                                    | ✅         | Service                                 |
+| statefulsets                              | apps/v1                               | ✅         | StatefulSet                             |
+| storageclasses                            | storage.k8s.io/v1                     | ❌         | StorageClass                            |
+| subjectaccessreviews                      | authorization.k8s.io/v1               | ❌         | SubjectAccessReview                     |
+| tokenreviews                              | authentication.k8s.io/v1              | ❌         | TokenReview                             |
+| validatingadmissionpolicies               | admissionregistration.k8s.io/v1       | ❌         | ValidatingAdmissionPolicy               |
+| validatingadmissionpolicybindings         | admissionregistration.k8s.io/v1       | ❌         | ValidatingAdmissionPolicyBinding        |
+| validatingwebhookconfigurations           | admissionregistration.k8s.io/v1       | ❌         | ValidatingWebhookConfiguration          |
+| volumeattachments                         | storage.k8s.io/v1                     | ❌         | VolumeAttachment                        |
+
+---
