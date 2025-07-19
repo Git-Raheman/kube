@@ -1,0 +1,256 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: docmost
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: docmost-secrets
+  namespace: docmost
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: admin
+  SMTP_USERNAME: mail.id.com
+  SMTP_PASSWORD: password
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-docmost-storage
+  namespace: docmost
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-client
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-docsmost-db
+  namespace: docmost
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nfs-client
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-docsmost-redis
+  namespace: docmost
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nfs-client
+  resources:
+    requests:
+      storage: 512Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docmost
+  namespace: docmost
+  labels:
+    app: docmost
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: docmost
+  template:
+    metadata:
+      labels:
+        app: docmost
+    spec:
+      containers:
+        - name: docmost
+          image: docmost/docmost:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: APP_URL
+              value: "http://alldocs.in"
+            - name: APP_SECRET
+              value: "c468c020dadaabc9d2ad1cbc13527575f687c9be1f5ac970c59215d5b4b28016"
+            - name: DATABASE_URL
+              value: "postgresql://docmost:admin@docsmost-db:5432/docmost?schema=public"
+            - name: REDIS_URL
+              value: "redis://docsmost-redis:6379"
+            - name: MAIL_DRIVER
+              value: smtp
+            - name: SMTP_HOST
+              value: smtp.gmail.com
+            - name: SMTP_PORT
+              value: "587"
+            - name: SMTP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: docmost-secrets
+                  key: SMTP_USERNAME
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: docmost-secrets
+                  key: SMTP_PASSWORD
+            - name: SMTP_SECURE
+              value: tls
+            - name: MAIL_FROM_ADDRESS
+              value: docs
+            - name: MAIL_FROM_NAME
+              value: Docmost-Server
+          volumeMounts:
+            - name: docmost-storage
+              mountPath: /app/data/storage
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: docmost-storage
+          persistentVolumeClaim:
+            claimName: pvc-docmost-storage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docsmost-db
+  namespace: docmost
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docsmost-db
+  template:
+    metadata:
+      labels:
+        app: docsmost-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          env:
+            - name: POSTGRES_DB
+              value: docmost
+            - name: POSTGRES_USER
+              value: docmost
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: docmost-secrets
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: db-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: db-storage
+          persistentVolumeClaim:
+            claimName: pvc-docsmost-db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docsmost-redis
+  namespace: docmost
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docsmost-redis
+  template:
+    metadata:
+      labels:
+        app: docsmost-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7.2-alpine
+          volumeMounts:
+            - name: redis-storage
+              mountPath: /data
+      volumes:
+        - name: redis-storage
+          persistentVolumeClaim:
+            claimName: pvc-docsmost-redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: docmost-service
+  namespace: docmost
+spec:
+  type: LoadBalancer
+  selector:
+    app: docmost
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: docsmost-db
+  namespace: docmost
+spec:
+  selector:
+    app: docsmost-db
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: docsmost-redis
+  namespace: docmost
+spec:
+  selector:
+    app: docsmost-redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: docmost-hpa
+  namespace: docmost
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: docmost
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
