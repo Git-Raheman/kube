@@ -24,7 +24,6 @@ The [nfs-subdir-external-provisioner] allows Kubernetes to dynamically provision
 ### 1. Create a Namespace
 ```bash
 kubectl create namespace nfs-storage
----
 
 ### 2. Add Helm Repo
 ```bash
