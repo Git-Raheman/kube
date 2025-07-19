@@ -1,4 +1,3 @@
-````markdown
 # NFS Subdir External Provisioner (Production Setup)
 
 This repository sets up a production-ready dynamic volume provisioner using NFS in a Kubernetes cluster using **Helm**.
@@ -17,7 +16,6 @@ The [nfs-subdir-external-provisioner](https://github.com/kubernetes-sigs/nfs-sub
 - Shared folder exported on the NFS server (e.g., `/kube-nfs`)
 - Kubernetes cluster set up using `kubeadm` (1 master + 4 nodes)
 - Helm installed on your machine
-```
 
 ---
 
