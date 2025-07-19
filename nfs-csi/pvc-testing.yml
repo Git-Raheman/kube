@@ -1,0 +1,47 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ubuntu-pvc
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: nfs-client
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu-pod
+  namespace: default
+  labels:
+    app: ubuntu-app
+spec:
+  containers:
+    - name: ubuntu-container
+      image: ubuntu
+      command: [ "sleep", "infinity" ]
+      volumeMounts:
+        - name: ubuntu-volume
+          mountPath: /mnt/ubuntu
+  volumes:
+    - name: ubuntu-volume
+      persistentVolumeClaim:
+        claimName: ubuntu-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubuntu-service
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    app: ubuntu-app
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080
