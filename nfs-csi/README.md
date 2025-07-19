@@ -1,14 +1,3 @@
-No worries bro 💪 — I fixed all the issues for you:
-
-* Bad emoji characters (they were copy-pasted incorrectly).
-* Code blocks were not closed properly.
-* Missing or misplaced horizontal lines (`---`).
-* Markdown headers and formatting glitches.
-
----
-
-### ✅ Here's the **clean and GitHub-friendly version** of your `README.md`:
-
 ````markdown
 # NFS Subdir External Provisioner (Production Setup)
 
@@ -113,21 +102,3 @@ kubectl apply -f pvc.yaml
   ```
 
 ---
-
-## 🔗 Useful Links
-
-* [nfs-subdir-external-provisioner GitHub](https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner)
-* [Helm Chart on ArtifactHub](https://artifacthub.io/packages/helm/nfs-subdir-external-provisioner/nfs-subdir-external-provisioner)
-
----
-
-## 👨‍💻 Author
-
-Made with ❤️ by \[Your Name]
-
-```
-
----
-
-Let me know if you want this auto-pushed to your GitHub repo or saved to a `.md` file for download.
-```
