@@ -1,0 +1,70 @@
+---
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nginx-tesing
+
+---
+# PersistentVolumeClaim (using dynamic provisioning with nfs-client storage class)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-docmost-storage
+  namespace: nginx-tesing
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-client
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: nginx-tesing
+  labels:
+    app: nginx
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: dockeraheman/nginx-pod-logs:v1
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: nginx-logs
+          mountPath: /logs
+      volumes:
+      - name: nginx-logs
+        persistentVolumeClaim:
+          claimName: pvc-docmost-storage
+
+---
+# Service (LoadBalancer using MetalLB)
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  namespace: nginx-tesing
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local  # This preserves client IP
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
