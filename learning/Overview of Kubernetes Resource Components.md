@@ -1,9 +1,4 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" class="logo" width="120"/>
-
 # Overview of Kubernetes Resource Components
-
-Kubernetes uses resource components to manage compute, memory, and other resources for containers and applications running in a cluster. Here is a straightforward overview:
-
 ## Core Resource Components
 
 ### 1. CPU (Central Processing Unit)
